@@ -1,0 +1,35 @@
+# Secrets — never commit
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Local Qdrant storage (cloud is used in production)
+qdrant_storage/
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+data/markdown/
+önemli.txt
+
+# Archive — unused/legacy code
+_archive/
+
+# Excluded analysis / scratch files
+embedding_analiz/
+fix_testdataset.py
+ingest_from_md.py
+ingest_manual_md.py
+run_ingestion_tables.py
+merge_md.py
+testdataset_fixed.csv
+doc/output/
