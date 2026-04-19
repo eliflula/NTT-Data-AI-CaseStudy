@@ -15,6 +15,7 @@ jobs:
       QDRANT_URL: "https://dummy.qdrant.io:6333"
       QDRANT_API_KEY: "dummy"
       GROQ_API_KEY: "dummy"
+      TAVILY_API_KEY: "dummy"
       MONGO_URL: ""
 
     steps:
