@@ -19,6 +19,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 logging.getLogger("transformers").setLevel(logging.WARNING)
+logging.getLogger("transformers.utils.import_utils").setLevel(logging.ERROR)
+logging.getLogger("timm").setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(

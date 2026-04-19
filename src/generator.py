@@ -1,36 +1,8 @@
 from __future__ import annotations
-
-# import re  # CoT aktif edilince açılacak
 from dataclasses import dataclass
-
 from groq import Groq
 from qdrant_client.models import ScoredPoint
-
 from src.config import settings
-
-# ---------------------------------------------------------------------------
-# Chain-of-Thought eklentisi — şimdilik devre dışı
-# Aktif etmek için:
-#   1. Üstteki `import re` satırını uncomment yap
-#   2. _COT_BLOCK'u _SYSTEM_PROMPT içindeki ## RULES satırından önce ekle
-#   3. generate() metodundaki _THINKING_RE.sub satırını uncomment yap
-#
-# _COT_BLOCK = """
-# ## REASONING PROCESS (mandatory)
-#
-# Before writing your final answer, reason step by step inside <thinking> tags.
-# In your thinking block:
-# - Identify which chunks are relevant to the question.
-# - Note the years and sources of relevant data.
-# - Check for numerical values; verify units and magnitudes.
-# - For multi-year questions, compare figures explicitly (e.g. 2022: X → 2024: Y, delta: Z).
-# - Decide if the context is sufficient to answer; if not, prepare the fallback phrase.
-# - Plan a detailed response: what background info, what key figures, what trends to include.
-#
-# Only after completing your thinking block, write the final answer outside the tags.
-# """
-# _THINKING_RE = re.compile(r"<thinking>.*?</thinking>", re.DOTALL)
-# ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT = """You are an AI assistant designed to answer questions based strictly on \
 retrieved context from NTT DATA sustainability and corporate documents or web search results.
@@ -117,7 +89,6 @@ class GeneratorService:
             max_tokens=2048,
         )
         usage = response.usage
-        # answer = _THINKING_RE.sub("", raw).strip()  # CoT aktif edilince uncomment
         answer = response.choices[0].message.content
         return GenerateResult(
             answer=answer,

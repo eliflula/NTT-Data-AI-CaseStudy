@@ -22,7 +22,7 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
 - 🧩 **Agentic RAG**: LangGraph ReAct agent decides which tool to call and how many times
 - ✏️ **Query rewriting**: converts shorthand or non-English questions into precise English search queries
 - 🎯 **LLM grading + reranking**: Groq 70b scores retrieved chunks for relevance before generation
-- 🌍 **Web fallback**: automatically searches DuckDuckGo when documents don't contain the answer
+- 🌍 **Web fallback**: automatically searches Tavily when documents don't contain the answer
 - 📑 **Advanced PDF processing**: semantic chunking with Docling extraction
 - 💡 **Multi-document reasoning**: compares data across report years
 - ⚡ **Async API**: non-blocking FastAPI endpoints with `asyncio.to_thread`
@@ -32,6 +32,59 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
 ---
 
 ## 🏛️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Preprocessing                            │
+│      Documents → Docling Parsing → Structured Markdown          │
+│                      → Semantic Chunking                        │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+┌──────────┐   ┌────────────────▼──────────┐
+│   User   │   │     Vector Embeddings     │
+│ Question │──►│       (BAAI/bge-m3)       │
+└──────────┘   └────────────────┬──────────┘
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │    Search Document    │
+                    │       (Qdrant)        │
+                    └───────────┬───────────┘
+                                │
+                                ▼
+         ┌──────────────────────────────────┐   ┌─────────────────────┐
+         │          GRADER AGENT            │   │    AGENT TOOLS      │
+         │  Think → Act → Observe → Think   │◄─►│  ┌───────────────┐  │
+         │                                  │   │  │  Search Doc   │  │
+         │   ┌──────────┐  ┌────────────┐   │   │  │   (Qdrant)    │  │
+         │   │ RELEVANT │  │ IRRELEVANT │   │   │  └───────────────┘  │
+         │   └─────┬────┘  └──────┬─────┘   │   │  ┌───────────────┐  │
+         │                        │         │  │   │  │   Web Search  │  
+         └─────────┼───────────────┼────────┘   │  │ (DuckDuckGo)  │  │
+                   │               │            │  └───────────────┘  │
+                   │               │            └─────────────────────┘
+        ┌──────────▼──────┐  ┌─────▼──────────┐
+        │  Reranker Agent │  │   Web Search   │
+        └────────┬────────┘  └───────┬────────┘
+                 │                   │
+                 └─────────┬─────────┘
+                           │
+                           ▼
+              ┌────────────────────────┐   ┌──────────────────────┐
+              │       GENERATOR        │──►│ Observability/Logging│
+              │     Final Response     │   │      (MongoDB)       │
+              └────────────────────────┘   └──────────────────────┘
+```
+
+### LLM & Embedding Models
+
+| Model | Role | Purpose |
+|---|---|---|
+| `llama-3.1-8b-instant` | ReAct Agent, Query Rewrite | Tool selection, fast routing |
+| `llama-3.3-70b-versatile` | Grader, Reranker, Generator | High-quality reasoning and accuracy |
+| `BAAI/bge-m3` | Vector Embedding | Multi-functionality, multilingual, multi-granularity |
+
+---
 
 ## ⚙️ Tech Stack
 

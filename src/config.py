@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     qdrant_url: str
     qdrant_api_key: str
     groq_api_key: str
+    tavily_api_key: str = ""
+    hf_token: str = ""
 
     # MongoDB — optional; logging is disabled when mongo_url is empty
     mongo_url: str = ""
@@ -22,11 +24,8 @@ class Settings(BaseSettings):
 
     collection: str = "ntt_data_sustainability"
     top_k: int = 5
-    retrieval_top_k: int = 10          
-    reranker_model: str = "BAAI/bge-reranker-v2-m3"
-    reranker_top_k: int = 5            
-    use_reranker: bool = True         
-    llm_model: str =  "llama-3.3-70b-versatile" # "llama-3.3-70b-versatile"
+    retrieval_top_k: int = 10
+    llm_model: str = "llama-3.3-70b-versatile"
     embedding_model: str = "BAAI/bge-m3"
     vector_dim: int = 1024
 

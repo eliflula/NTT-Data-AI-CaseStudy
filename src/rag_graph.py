@@ -1,17 +1,16 @@
 from __future__ import annotations
 import json
 import logging
-from ddgs import DDGS
 from groq import Groq
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 from qdrant_client.models import ScoredPoint
-
 from src.config import settings
 from src.embedder import EmbeddingService
 from src.generator import GeneratorService
 from src.retriever import RetrieverService
+from src.web_searcher import WebSearchService
 
 logger = logging.getLogger(__name__)
 
@@ -62,13 +61,14 @@ class RAGGraph:
 
     START → agent (ReAct loop) → END
               ├─ tool: search_documents  (Qdrant + LLM rerank)
-              └─ tool: search_web        (DuckDuckGo)
+              └─ tool: search_web        (Tavily)
     """
 
     def __init__(self) -> None:
         embedder = EmbeddingService()
         self._retriever = RetrieverService(embedder)
         self._generator = GeneratorService()
+        self._web_searcher = WebSearchService()
         self._groq = Groq(api_key=settings.groq_api_key)
 
         # Per-request state — reset in ask()
@@ -193,43 +193,27 @@ class RAGGraph:
 
         @tool
         def search_web(query: str) -> str:
-            """Search the internet using DuckDuckGo for up-to-date information."""
+            """Search the internet using Tavily for up-to-date information."""
             logger.info('[AGENT] tool=search_web query="%s"', query)
-            with DDGS() as ddgs:
-                hits = list(ddgs.text(query, max_results=5))
 
-            # RAG zaten başarılıysa web context'i ezme
             if self._last_chunks:
                 logger.info("[AGENT] search_web: RAG context already found, ignoring web results")
                 return "Documents already provided sufficient context."
 
-            self._last_web_urls = [
-                {"title": h.get("title", ""), "url": h.get("href", "")}
-                for h in hits
-            ]
+            results = self._web_searcher.search(query)
+            self._last_web_urls = [{"title": r.title, "url": r.url} for r in results]
             self._last_source_type = "web"
             self._last_chunks = []
-
-            logger.info("[AGENT] search_web: %d results", len(hits))
-            for i, w in enumerate(self._last_web_urls, 1):
-                logger.info("[AGENT]   [%d] %s", i, w["url"])
-
-            context_parts = [
-                f"[Result {i}] {h.get('title', '')}\n{h.get('body', '')}"
-                for i, h in enumerate(hits, 1)
-            ]
-            self._last_context = "[Web Search Results]\n\n" + "\n\n---\n\n".join(context_parts)
+            self._last_context = self._web_searcher.build_context(results)
             return self._last_context
 
+             #create_react_agent = hidden graph (nodes + edges + loop)
         return create_react_agent(
             model=llm,
             tools=[search_documents, search_web],
             prompt=_AGENT_SYSTEM_PROMPT,
         )
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def ask(self, question: str) -> tuple[str, str, list[ScoredPoint], list[dict]]:
         """Returns (answer, source_type, rag_chunks, web_urls)."""

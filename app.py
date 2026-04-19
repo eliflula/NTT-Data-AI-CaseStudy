@@ -1,9 +1,22 @@
 """Streamlit UI for the NTT DATA Sustainability RAG system."""
 from __future__ import annotations
 
+import logging
 import streamlit as st
 
 from src.rag_graph import RAGGraph
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+logging.getLogger("transformers").setLevel(logging.WARNING)
+logging.getLogger("transformers.utils.import_utils").setLevel(logging.ERROR)
+logging.getLogger("timm").setLevel(logging.ERROR)
 
 st.set_page_config(
     page_title="NTT DATA Sustainability RAG",
