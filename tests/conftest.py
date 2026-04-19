@@ -10,6 +10,7 @@ def pytest_configure(config: object) -> None:  # noqa: ARG001
         "sentence_transformers.CrossEncoder",
         "qdrant_client.QdrantClient",
         "pymongo.MongoClient",
+        "tavily.TavilyClient",
     ]
     for target in targets:
         p = patch(target, return_value=MagicMock())
