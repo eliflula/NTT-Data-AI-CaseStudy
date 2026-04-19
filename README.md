@@ -59,8 +59,8 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
          │   ┌──────────┐  ┌────────────┐   │   │  │   (Qdrant)    │  │
          │   │ RELEVANT │  │ IRRELEVANT │   │   │  └───────────────┘  │
          │   └─────┬────┘  └──────┬─────┘   │   │  ┌───────────────┐  │
-         │                        │         │  │   │  │   Web Search  │  
-         └─────────┼───────────────┼────────┘   │  │ (DuckDuckGo)  │  │
+         │                        │         │   │  │  Web Search   │  │
+         └─────────┼───────────────┼────────┘   │  │   (Tavily )   │  │
                    │               │            │  └───────────────┘  │
                    │               │            └─────────────────────┘
         ┌──────────▼──────┐  ┌─────▼──────────┐
@@ -96,7 +96,7 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
 | Vector DB | Qdrant Cloud |
 | PDF extraction | Docling |
 | Chunking | LangChain |
-| Web search | DuckDuckGo |
+| Web search | Tavily |
 | API | FastAPI + `asyncio.to_thread` |
 | UI | Streamlit |
 | Logging | MongoDB Atlas |
