@@ -2,6 +2,8 @@
 
 An Agentic RAG system that answers questions over NTT DATA's publicly available sustainability reports (2020–2025). A LangGraph ReAct agent decides at runtime whether to search the vector database or fall back to web search — with LLM-based relevance grading, query rewriting, and reranking at each step.
 
+![Agentic RAG Architecture](Agentic-RAG-Architecture.png)
+
 ## 🗺️ Table of Contents
 
 - [Features](#-features)
@@ -20,7 +22,7 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
 ## 🚀 Features
 
 - 🧩 **Agentic RAG**: LangGraph ReAct agent decides which tool to call and how many times
-- ✏️ **Query rewriting**: converts shorthand or non-English questions into precise English search queries
+- ✏️ **Query rewriting**: converts shorthand questions into precise search queries for improved search accuracy
 - 🎯 **LLM grading + reranking**: Groq 70b scores retrieved chunks for relevance before generation
 - 🌍 **Web fallback**: automatically searches Tavily when documents don't contain the answer
 - 📑 **Advanced PDF processing**: semantic chunking with Docling extraction
@@ -64,7 +66,8 @@ An Agentic RAG system that answers questions over NTT DATA's publicly available 
                    │               │            │  └───────────────┘  │
                    │               │            └─────────────────────┘
         ┌──────────▼──────┐  ┌─────▼──────────┐
-        │  Reranker Agent │  │   Web Search   │
+        │  Score-based    │  │  Web Search    │
+        │    Reranking    │  │                │
         └────────┬────────┘  └───────┬────────┘
                  │                   │
                  └─────────┬─────────┘

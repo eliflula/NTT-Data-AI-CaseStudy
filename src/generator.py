@@ -71,9 +71,11 @@ class GeneratorService:
         for i, point in enumerate(results, 1):
             p = point.payload or {}
             parts.append(
-                f"[Chunk {i} | Source: {p.get('source', '')} | "
-                f"Year: {p.get('year', '')} | Page: {p.get('page', '')} | "
-                f"Score: {point.score:.3f}]\n{p.get('content', '')}"
+                # f"[Chunk {i} | Source: {p.get('source', '')} | "
+                # f"Year: {p.get('year', '')} | Page: {p.get('page', '')} | "
+                # f"Score: {point.score:.3f}]\n{p.get('content', '')}"
+                # f"[Chunk {i} | Year: {p.get('year', '')} | Page: {p.get('page', '')}]\n{p.get('content', '')}"
+                f"{p.get('content', '')}"
             )
         return "\n\n---\n\n".join(parts)
 

@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import logging
+import time
 import streamlit as st
 
+
+from src.mongo_logger import QueryLogger
 from src.rag_graph import RAGGraph
 
 logging.basicConfig(
@@ -65,7 +68,13 @@ def load_pipeline() -> RAGGraph:
     return RAGGraph()
 
 
+@st.cache_resource
+def load_mongo() -> QueryLogger:
+    return QueryLogger()
+
+
 pipeline = load_pipeline()
+mongo = load_mongo()
 
 # ── Header ───
 st.markdown("# 🌱 NTT DATA Sustainability RAG")
@@ -84,7 +93,34 @@ ask = st.button("Ask", disabled=not question)
 # ── Query ───
 if ask and question:
     with st.spinner("Searching through sustainability reports…"):
+        t0 = time.time()
         answer, source_type, chunks, web_urls = pipeline.ask(question)
+        latency = round(time.time() - t0, 3)
+
+    if source_type == "web":
+        log_sources = [
+            type("S", (), {"source": w.get("title", ""), "score": 0.0, "url": w.get("url", "")})()
+            for w in web_urls
+        ]
+    else:
+        log_sources = [
+            type("S", (), {
+                "source": (point.payload or {}).get("source", ""),
+                "score": point.score,
+            })()
+            for point in chunks
+        ]
+
+    mongo.log(
+        question=question,
+        answer=answer,
+        sources=log_sources,
+        source_type=source_type,
+        latency=latency,
+        prompt_tokens=0,
+        completion_tokens=0,
+        total_tokens=0,
+    )
 
     st.divider()
     col_answer, col_sources = st.columns([3, 2])

@@ -37,7 +37,7 @@ Question: {question}
 Chunks:
 {chunks}"""
 
-_RERANK_MIN_SCORE = 2
+_RERANK_MIN_SCORE =2
 _RERANK_TOP_K = 5
 
 _REWRITE_PROMPT = """Convert the following question into a precise search query.
@@ -100,11 +100,11 @@ class RAGGraph:
     def _rerank(self, question: str, chunks: list[ScoredPoint]) -> list[ScoredPoint]:
         """Score chunks with Groq, filter low-scorers, return top-k."""
         formatted = "\n\n".join(
-            f"[{i + 1}] {(chunks[i].payload or {}).get('content', '')[:400]}"
+            f"[{i + 1}] {(chunks[i].payload or {}).get('content', '')[:1000]}"
             for i in range(len(chunks))
         )
         response = self._groq.chat.completions.create(
-            model=settings.llm_model,
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": _RERANK_PROMPT.format(
                 question=question, chunks=formatted
             )}],
@@ -165,7 +165,7 @@ class RAGGraph:
             sample = self._generator.build_context(results[:3])
             grade_prompt = _GRADER_PROMPT.format(question=query, context=sample[:2000])
             grade_resp = self._groq.chat.completions.create(
-                model=settings.llm_model,
+                model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": grade_prompt}],
                 temperature=0,
                 max_tokens=5,
