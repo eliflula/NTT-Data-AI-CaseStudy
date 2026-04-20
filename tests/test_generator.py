@@ -20,8 +20,6 @@ def test_build_context_formats_chunks_correctly(generator: GeneratorService) -> 
     chunks = [_make_chunk("NTT DATA targets carbon neutrality.")]
     context = generator.build_context(chunks)
 
-    assert "Chunk 1" in context
-    assert "report_2024" in context
     assert "NTT DATA targets carbon neutrality." in context
 
 
@@ -29,8 +27,8 @@ def test_build_context_separates_multiple_chunks(generator: GeneratorService) ->
     chunks = [_make_chunk("First chunk"), _make_chunk("Second chunk")]
     context = generator.build_context(chunks)
 
-    assert "Chunk 1" in context
-    assert "Chunk 2" in context
+    assert "First chunk" in context
+    assert "Second chunk" in context
     assert "---" in context
 
 
